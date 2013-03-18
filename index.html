@@ -30,20 +30,38 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="start">
 
-      <h1>Bootstrap starter template</h1>
+      <h1>Upload your Payoneer transactions PDF</h1>
       <p><input type="file" id="pdf"/></p>
 
     </div> <!-- /container -->
 
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <div class="container" id="transactions" style="display: none">
+      <table class="table table-striped">
+        <thead>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Amount</th>
+        </thead> 
+        <tbody>
+        </tbody>
+      </table>
+    </div>
 
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-  <script type="text/javascript" src="/bootstrap-filestyle.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 
-  <script type="text/javascript" src="/pdf.js"></script>
-  <script type="text/javascript" src="/app.js"></script>
+    <script type="text/javascript" src="/bootstrap-filestyle.min.js"></script>
+
+    <script type="text/javascript" src="/pdf.js"></script>
+    <script type="text/javascript" src="/q.min.js"></script>
+    <script type="text/javascript" src="/pdfjs_q_patch.js"></script>
+
+    <script type="text/javascript" src="/transaction_parser.js"></script>
+    <script type="text/javascript" src="/transaction_view.js"></script>
+
+    <script type="text/javascript" src="/app.js"></script>
 </body>
 </html>
