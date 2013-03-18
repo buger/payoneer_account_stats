@@ -46,7 +46,6 @@ var TransactionParser = TP = {
     } 
 
     var total_pages = pdf.pdfInfo.numPages;
-    var parsed_pages = 0;
 
     var promises = [];
 
