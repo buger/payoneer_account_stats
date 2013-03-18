@@ -1,5 +1,6 @@
 var TransactionsView = TV = {
 
+  // http://underscorejs.org/#template
   tableTMPL: _.template(" \
     <h1>Transactions from 01.<%=month%>.<%=year%></h1> \
     <table class='table table-striped'> \
@@ -38,7 +39,8 @@ var TransactionsView = TV = {
   render: function(transactions) {
     $('#transactions tbody').html('')
 
-    // Grouping by month    
+    // Grouping by month
+    // http://underscorejs.org/#groupBy
     grouped = _.groupBy(transactions, function(t){ 
       return t.date.getFullYear() + ":" + (t.date.getMonth()+1)
     });
