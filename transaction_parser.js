@@ -15,13 +15,13 @@ var TransactionParser = TP = {
     for (var i=0; i<items.length; i++) {
       if (!found_transactions) {            
         found_transactions = items[i].str == "Currency";
-        continue
+        continue;
       }
 
       TP.transactions.push({
-        date: items[i].str,
+        date: new Date(Date.parse(items[i].str)),
         name: items[++i].str,
-        amount: items[++i].str,
+        amount: parseFloat(items[++i].str),
         currency: items[++i].str
       })
     }
