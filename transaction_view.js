@@ -5,11 +5,7 @@ var TransactionsView = {
   // http://underscorejs.org/#template
   tableTMPL: _.template(" \
     <h1>Transactions from 01.<%=month%>.<%=year%></h1> \
-    <ul class='totals'> \
-      <% _.each(categories, function(c){ %> \
-        <li><%=c[0]%>: <%=c[1]%></li> \
-      <% }) %> \
-    </ul> \
+    <div id='chart_<%=period%>'></div> \
     <table class='table table-striped'> \
       <thead> \
         <th>Date</th> \
@@ -19,10 +15,10 @@ var TransactionsView = {
       </thead> \
       <tbody> \
         <% _.each(transactions, function(t){ %> \
-          <tr> \
+          <tr class='<%=t.category == 'Other' ? 'warning' : '' %>'> \
             <td class='date'><%=t.date.toDateString()%></td> \
             <td class='name'><%=t.name%></td> \
-            <td class='amount'><%=t.amount%></td> \
+            <td class='amount'><%=t.amount.toFixed(2)%></td> \
             <td> \
               <div class='btn-group'> \
                 <a class='btn btn-primary' href='#'><%=t.category%></a> \
@@ -41,6 +37,44 @@ var TransactionsView = {
       </tbody> \
     </table> \
   "),
+
+  graphOptions: {
+    chart: {
+      renderTo: 'UNSET',
+    },
+    credits: { 
+      enabled: false 
+    },
+    title: {
+      text: null
+    },
+    tooltip: {
+      pointFormat: 'Spent: <b>${point.y.toFixed(2)}</b>',
+      percentageDecimals: 2
+    },
+    legend: {
+      align: 'right',
+      verticalAlign: 'top',
+      layout: 'vertical',
+      labelFormatter: function(){ 
+        return this.name + ": $" + this.y.toFixed(2) 
+      },
+      y: 40,
+      x: -300
+    },
+    plotOptions: {
+      pie: { 
+        animation: false,
+        showInLegend: true,
+        center: [200,180]
+      }
+    },
+    series: [{
+      type: 'pie',
+      name: 'Transactions stats',
+      data: 'UNSET'
+    }]
+  },
 
   
   categoryTypes: function(){
@@ -71,9 +105,9 @@ var TransactionsView = {
   },
 
 
-  renderTransactionTable: function(date, transactions) {
-    year  = date.split(':')[0];
-    month = date.split(':')[1];
+  renderTransaction: function(period, transactions) {
+    year  = period.split(':')[0];
+    month = period.split(':')[1];
 
     transactions = transactions.map(function(t){
       t.category = this.transactionCategories[t.name] || "Other";
@@ -82,20 +116,34 @@ var TransactionsView = {
     }.bind(this));
 
     html = this.tableTMPL({
+      period: period,
+
       month: month,
       year: year,
 
-      transactions: transactions,
-
-      categories: this.getTotals(transactions),
+      transactions: transactions,      
 
       category_types: this.categoryTypes()
     });
 
-    return html;
+    var div = document.createElement('div');
+    div.innerHTML = html;
+
+    // All our functions is synchronious `setTimeout(func(){...},0)` will be called right after browser render 
+    setTimeout(function(){
+      options = this.graphOptions
+      options.chart.renderTo = 'chart_'+period;
+      options.series[0].data = this.getTotals(transactions);
+
+      new Highcharts.Chart(options);
+    }.bind(this), 0)
+
+    return div;
   },
 
   render: function(transactions) {
+    var dom = document.createDocumentFragment();
+
     this.transactions = transactions;
 
     // Grouping by month
@@ -104,14 +152,12 @@ var TransactionsView = {
       return t.date.getFullYear() + ":" + (t.date.getMonth()+1)
     });
 
-    var html = "";
-
     for (date in grouped) {
-      html += this.renderTransactionTable(date, grouped[date]);
+      dom.appendChild(this.renderTransaction(date, grouped[date]));
     }
 
     // Showing table only after it get rendered    
-    $('#transactions').html(html).show()
+    $('#transactions').html(dom).show()
   },
 
   bindEvents: function(){
@@ -119,8 +165,6 @@ var TransactionsView = {
       var link = evt.currentTarget;
 
       name = $(link).parents('tr').find('td.name').text();
-
-      console.warn(link.className)
 
       if (link.className.indexOf('new_category') != -1) {
         category = prompt("Enter new category name for '"+name+"'");

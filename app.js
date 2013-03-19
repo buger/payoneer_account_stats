@@ -8,7 +8,6 @@ $("#pdf").filestyle({
 // We don't need to use workers, it will simplify development
 PDFJS.disableWorker = true
 
-
 function handleFileSelect(evt) {
   file = evt.target.files[0]; // We support only 1 file at time
 
