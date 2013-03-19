@@ -49,7 +49,7 @@ var TransactionsView = {
       text: null
     },
     tooltip: {
-      pointFormat: 'Spent: <b>${point.y.toFixed(2)}</b>',
+      pointFormat: 'Spent: <b>${point.y}</b>',
       percentageDecimals: 2
     },
     legend: {
