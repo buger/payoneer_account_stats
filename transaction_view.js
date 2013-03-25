@@ -1,7 +1,5 @@
 var TransactionsView = {
 
-  transactionCategories: {},
-
   // http://underscorejs.org/#template
   tableTMPL: _.template(" \
     <h1>Transactions from 01.<%=month%>.<%=year%></h1> \
@@ -56,8 +54,8 @@ var TransactionsView = {
       align: 'right',
       verticalAlign: 'top',
       layout: 'vertical',
-      labelFormatter: function(){ 
-        return this.name + ": $" + this.y.toFixed(2) 
+      labelFormatter: function(){
+        return this.name + ": $" + this.y.toFixed(2)
       },
       y: 40,
       x: -300
@@ -74,6 +72,26 @@ var TransactionsView = {
       name: 'Transactions stats',
       data: 'UNSET'
     }]
+  },
+
+
+  getCategory: function(name){
+    if (this.transactionCategories === undefined) {
+      if (window.localStorage['categories']) {
+        this.transactionCategories = JSON.parse(window.localStorage['categories']);
+      } else {
+        this.transactionCategories = {};
+      }
+    }
+
+    return this.transactionCategories[name] || 'Other';
+  },
+
+
+  setCategory: function(name, category){
+    this.transactionCategories[name] = category;
+
+    window.localStorage['categories'] = JSON.stringify(this.transactionCategories);
   },
 
   
@@ -110,7 +128,7 @@ var TransactionsView = {
     month = period.split(':')[1];
 
     transactions = transactions.map(function(t){
-      t.category = this.transactionCategories[t.name] || "Other";
+      t.category = this.getCategory(t.name);
 
       return t;
     }.bind(this));
@@ -128,8 +146,12 @@ var TransactionsView = {
 
     var div = document.createElement('div');
     div.innerHTML = html;
+    
 
-    // All our functions is synchronious `setTimeout(func(){...},0)` will be called right after browser render 
+    /*
+      Highcharts (as any other charting library) require container,used for reneding, to be accessible via DOM queries. As we creating HTML elements without using DOM, we can't use DOM queries to access them. But all our functions is synchronious we delay chart rendering with `setTimeout(func(){...},0)` trick. It will be called right after browser finish render our html, and our elemenents will be visible. Underscore's _.defer function do same.
+    */
+  
     setTimeout(function(){
       options = this.graphOptions
       options.chart.renderTo = 'chart_'+period;
@@ -140,6 +162,7 @@ var TransactionsView = {
 
     return div;
   },
+
 
   render: function(transactions) {
     var dom = document.createDocumentFragment();
@@ -160,6 +183,7 @@ var TransactionsView = {
     $('#transactions').html(dom).show()
   },
 
+
   bindEvents: function(){
     $('#transactions').on('click', ".dropdown-menu a", function(evt){
       var link = evt.currentTarget;
@@ -172,7 +196,7 @@ var TransactionsView = {
         category = link.text;
       }
 
-      this.transactionCategories[name] = category;
+      this.setCategory(name, category);
 
       this.render(this.transactions); 
 
