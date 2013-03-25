@@ -6,6 +6,6 @@ require.config({
   }
 })
 
-require(['cs!app/app'], function (App) {
-	new App()
+require(['jquery','underscore','cs!app/app'], function ($, _, App) {
+	app = new App
 });
