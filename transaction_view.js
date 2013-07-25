@@ -55,7 +55,7 @@ var TransactionsView = {
       verticalAlign: 'top',
       layout: 'vertical',
       labelFormatter: function(){
-        return this.name + ": $" + this.y.toFixed(2)
+        return this.name + ": $" + (this.y ? this.y.toFixed(2) : 0)
       },
       y: 40,
       x: -300
